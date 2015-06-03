@@ -1,0 +1,18 @@
+dyn_o_mite:
+  listen: 0.0.0.0:8102
+  dyn_listen: 0.0.0.0:8101
+  gos_interval: 30000
+  dyn_seed_provider: simple_provider
+  timeout: 500
+  preconnect: true
+  redis: true
+  auto_eject_hosts: false
+  server_retry_timeout: 150000
+  servers:
+  - redis-server:6379:1
+  datacenter: docker
+  rack: rack1
+  tokens: '1'
+  dyn_seeds:
+  - dynomite.2:8101:rack1:docker:1431655765
+  - dynomite.3:8101:rack1:docker:2863311532
