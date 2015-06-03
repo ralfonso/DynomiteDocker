@@ -17,28 +17,31 @@ RUN apt-get update && apt-get install -y \
 	git \
 	libssl-dev \
 	libtool \
-	python-software-properties \
-	redis-server \
-	tcl8.5
+	python-software-properties
+#	tcl8.5
 
+#	redis-server \
 # Get Redis Running
-RUN service redis-server start
+#RUN service redis-server start
 
 # Clone the Dynomite Git
-RUN git clone https://github.com/Netflix/dynomite.git
-RUN echo 'Git repo has been cloned in your Docker VM'
+COPY dynomite /root/dynomite
+RUN echo 'Git repo has been copied in your Docker VM'
 
 # Move to working directory
-WORKDIR dynomite/
+WORKDIR /root/dynomite/
+RUN pwd
 
 # Autoreconf
 RUN autoreconf -fvi \
 	&& ./configure --enable-debug=log \
-	&& CFLAGS="-ggdb3 -O0" ./configure --enable-debug=full \
 	&& make
 	&& make install
 
 ##################### INSTALLATION ENDS #####################
+#
+#
+COPY dynomite.yml /etc/dynomite.yml
 
 # Expose the peer port
 RUN echo 'Exposing peer port 8101'
@@ -53,7 +56,7 @@ CMD ["--port 8102"]
 
 # Setting the dynomite as the dockerized entry-point application
 RUN echo 'Starting Dynomite'
-ENTRYPOINT ["src/dynomite", "--conf-file=conf/redis_single.yml", "-v11"]
+ENTRYPOINT ["src/dynomite", "--conf-file=/etc/dynomite.yml", "-v6"]
 
 CMD ["run"]
 
